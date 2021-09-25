@@ -12,8 +12,10 @@
 	using YSDebugger;
  
     string mode = "console" or "disk";
-    string savePath = "D:"; use default.
+    string savePath = "D:"; // You can use default.
     YSDebug ysDebug = new YSDebug(mode, savePath);
+    
+    ysDebug.Print("hello world");
     
  기능: 
  
