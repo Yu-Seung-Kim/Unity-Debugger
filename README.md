@@ -15,6 +15,9 @@
     string savePath = "D:"; use default.
     YSDebug ysDebug = new YSDebug(mode, savePath);
     
+    ysDebug.Print("hello world");
+    ysDebug.Break();
+    
  기능: 
  
     현재 시간 출력 > 시:분:초
