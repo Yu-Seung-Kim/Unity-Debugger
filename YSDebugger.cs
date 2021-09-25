@@ -1,6 +1,6 @@
-﻿/*
- 제목: 디버그 (V0.1)
- 날짜: 2021년 09월 23일
+/*
+ 제목: 디버그 (V0.2)
+ 날짜: 2021년 09월 25일
  작성: 김유승 (inspire156@gmail.com)
  사용법:
 	using YSDebugger;
@@ -13,6 +13,7 @@
     현재 시간 출력 > 시:분:초
     Print(value)    > console 모드시 콘솔창에 value 값을 출력.
                     > disk 모드시 txt 파일로 value 값 저장.
+    Break()     > break point 설정.
  */
 
 using System;
@@ -21,40 +22,91 @@ using System.Text;
 
 namespace YSDebugger
 {
-    public class YSDebug
+    class YSDebug : PrintDebug
     {
+        public YSDebug(string mode = "console", string savePath = "D:", string saveFileName = "Result try")
+        {
+            DisplayModeProcess(mode, savePath, saveFileName);
+        }
+
+        // Print value.
+        public void Print(bool boolValue) { PrintProcess(boolValue.ToString()); }
+
+        public void Print(byte byteValue) { PrintProcess(byteValue.ToString()); }
+
+        public void Print(short shortValue) { PrintProcess(shortValue.ToString()); }
+
+        public void Print(int intValue) { PrintProcess(intValue.ToString()); }
+
+        public void Print(long longValue) { PrintProcess(longValue.ToString()); }
+
+        public void Print(ushort ushortValue) { PrintProcess(ushortValue.ToString()); }
+
+        public void Print(uint uintValue) { PrintProcess(uintValue.ToString()); }
+
+        public void Print(ulong ulongValue) { PrintProcess(ulongValue.ToString()); }
+
+        public void Print(float floatValue) { PrintProcess(floatValue.ToString()); }
+
+        public void Print(double doubleValue) { PrintProcess(doubleValue.ToString()); }
+
+        public void Print(decimal decimalValue) { PrintProcess(decimalValue.ToString()); }
+
+        public void Print(char charValue) { PrintProcess(charValue.ToString()); }
+
+        public void Print(string stringValue) { PrintProcess(stringValue.ToString()); }
+
+        public void Print(Object objectValue) { PrintProcess(objectValue.ToString()); }
+
+        // Set break point.
+        public void Break() { isBreakPoint = true; }
+    }
+
+    class PrintDebug
+    {
+        protected bool isBreakPoint = false;
+
         private string displayMode;
         private string saveResultPath;
         private string fileName;
+        private const string folderName = "YSDebug Result";
 
         private const string console = "console";
         private const string disk = "disk";
-        private const string folderName = "YSDebug Result";
+        private const string consoleAndDisk = "cd";
 
-        public YSDebug(string mode = "console", string savePath = "D:", string saveFileName = "Result try")
+        private bool isLineChange = true;
+        private int tapCount = 0;
+        private int maxStringLen = 24;
+        private int limitTapCount = 1;
+
+        protected void DisplayModeProcess(string mode, string savePath, string saveFileName)
         {
-            if (mode == console)
+            switch (mode)
             {
-                SetDisplayMode(mode);
-            }
-            else if (mode == disk)
-            {
-                fileName = saveFileName;
-                SetDisplayMode(mode);
-                diskSetting(savePath);
+                case console:
+                    SetDisplayMode(console);
+                    break;
+                case disk:
+                    fileName = saveFileName;
+                    SetDisplayMode(disk);
+                    DiskSetting(savePath);
+                    break;
+                case consoleAndDisk:
+                    fileName = saveFileName;
+                    SetDisplayMode(consoleAndDisk);
+                    DiskSetting(savePath);
+                    break;
             }
         }
 
-        private void diskSetting(string savePath)
+        private void SetDisplayMode(string mode) { displayMode = mode; }
+
+        private void DiskSetting(string savePath)
         {
             string folderPath = GetFolderPath(savePath);
             CreateFolder(folderPath);
             SetSaveResultPath(folderPath);
-        }
-
-        private void SetDisplayMode(string mode)
-        {
-            displayMode = mode;
         }
 
         private string GetFolderPath(string savePath)
@@ -77,7 +129,7 @@ namespace YSDebugger
             int tryCount = 0;
             while (true)
             {
-                saveResultPath = folderPath + "\\" + fileName + " = " + tryCount.ToString() + ".txt";
+                saveResultPath = GetSaveResultPath(folderPath, tryCount);
                 FileInfo fileInfo = new FileInfo(saveResultPath);
                 if (fileInfo.Exists)
                 {
@@ -90,97 +142,40 @@ namespace YSDebugger
             }
         }
 
-        private void GetSaveResultPath(string folderPath, int tryCount)
+        private string GetSaveResultPath(string folderPath, int tryCount)
         {
             string resultFile = folderPath + "\\" + fileName;
             string resultTryCount = " = " + tryCount.ToString();
             string resultFileFormat = ".txt";
             string resultPath = resultFile + resultTryCount + resultFileFormat;
+            return resultPath;
         }
 
-        // Print on console.
-        public void Print(bool value)
+        protected void PrintProcess(string valueString)
         {
-            PrintProcess(value.ToString());
-        }
+            if (isBreakPoint) return;
 
-        public void Print(byte value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(short value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(int value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(long value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(ushort value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(uint value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(ulong value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(float value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(double value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(decimal value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(char value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(string value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-        public void Print(Object value)
-        {
-            PrintProcess(value.ToString());
-        }
-
-
-        private void PrintProcess(string stringValue)
-        {
-            stringValue = GetNowTime() + stringValue;
-            if (displayMode == console)
+            valueString = GetTimeString(valueString);
+            valueString = GetAligedString(valueString);
+            switch (displayMode)
             {
-                PrintConsole(stringValue);
+                case console:
+                    PrintConsole(valueString);
+                    break;
+                case disk:
+                    PrintDisk(valueString);
+                    break;
+                case consoleAndDisk:
+                    PrintConsole(valueString);
+                    PrintDisk(valueString);
+                    break;
             }
-            else if (displayMode == disk)
-            {
-                PrintDisk(stringValue);
-            }
+        }
+
+        private string GetTimeString(string valueString)
+        {
+            string attachedTimeString = GetNowTime() + valueString;
+            return attachedTimeString;
         }
 
         private string GetNowTime()
@@ -190,20 +185,61 @@ namespace YSDebugger
             return nowTime;
         }
 
-        private void PrintConsole(string stringValue)
+        private string GetAligedString(string valueString)
         {
-            Console.WriteLine(stringValue);
+            ConfigLineChangeable(valueString);
+            string aligedString;
+            if (isLineChange)
+            {
+                aligedString = valueString + "\n";
+            }
+            else
+            {
+                aligedString = valueString + "\t";
+            }
+            return aligedString;
         }
 
-        private void PrintDisk(string stringValue)
+        private void ConfigLineChangeable(string valueString)
         {
-            stringValue = stringValue + "\n";
-            File.AppendAllText(saveResultPath, stringValue, Encoding.Default);
+            if (IsLineChangeable(valueString))
+            {
+                SetLineChangeOn();
+                InitTapCount();
+            }
+            else
+            {
+                if (IsLimitTapCount())
+                {
+                    SetLineChangeOn();
+                    InitTapCount();
+                }
+                else
+                {
+                    SetLineChangeOff();
+                    IncreaseTapCount();
+                }
+            }
         }
 
-        public void Break()
+        private bool IsLineChangeable(string valueString)
         {
-            Environment.Exit(1);
+            int stringLen = valueString.Length;
+            return (stringLen > maxStringLen);
         }
+
+        private void SetLineChangeOn() { isLineChange = true; }
+
+        private bool IsLimitTapCount() { return (tapCount >= limitTapCount); }
+
+        private void InitTapCount() { tapCount = 0; }
+
+        private void SetLineChangeOff() { isLineChange = false; }
+
+        private void IncreaseTapCount() { tapCount++; }
+
+        private void PrintConsole(string valueString) { Console.Write(valueString); }
+
+        private void PrintDisk(string valueString) { File.AppendAllText(saveResultPath, valueString, Encoding.Default); }
     }
 }
