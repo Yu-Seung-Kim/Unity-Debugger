@@ -1,13 +1,18 @@
 /*
- 제목: 디버그 (V0.2)
- 날짜: 2021년 09월 25일
+ 제목: 디버그 (V0.2.1)
+ 날짜: 2021년 09월 27일
  작성: 김유승 (inspire156@gmail.com)
  사용법:
 	using YSDebugger;
  
     string mode = "console" or "disk";
-    string savePath = "D:"; use default.
-    YSDebug ysDebug = new YSDebug(mode, savePath);
+    string savePath = "D:"; 
+    string saveFileName = "Result try";
+    int rowCount = 2; // row에 출력할 개수. 
+    
+    YSDebug ysDebug = new YSDebug(mode, savePath, saveFileName, rowCount);
+    or
+    YSDebug ysDebug = new YSDebug(mode, rowCount);
     
  기능: 
     현재 시간 출력 > 시:분:초
@@ -24,9 +29,16 @@ namespace YSDebugger
 {
     class YSDebug : PrintDebug
     {
-        public YSDebug(string mode = "console", string savePath = "D:", string saveFileName = "Result try")
+        public YSDebug(string mode = "console", string savePath = "D:", string saveFileName = "Result try", int rowCount = 2)
         {
-            DisplayModeProcess(mode, savePath, saveFileName);
+            DisplayModeProcess(mode, savePath, saveFileName, rowCount);
+        }
+
+        public YSDebug(string mode = "console", int rowCount = 2)
+        {
+            string savePath = "D:";
+            string saveFileName = "Result try";
+            DisplayModeProcess(mode, savePath, saveFileName, rowCount);
         }
 
         // Print value.
@@ -78,10 +90,11 @@ namespace YSDebugger
         private bool isLineChange = true;
         private int tapCount = 0;
         private int maxStringLen = 24;
-        private int limitTapCount = 1;
+        private int limitTapCount;
 
-        protected void DisplayModeProcess(string mode, string savePath, string saveFileName)
+        protected void DisplayModeProcess(string mode, string savePath, string saveFileName, int rowCount)
         {
+            SetLimitTapCount(rowCount);
             switch (mode)
             {
                 case console:
@@ -100,7 +113,10 @@ namespace YSDebugger
             }
         }
 
-        private void SetDisplayMode(string mode) { displayMode = mode; }
+        private void SetLimitTapCount(int rowCount) { this.limitTapCount = rowCount - 1; }
+
+    
+        private void SetDisplayMode(string mode) { this.displayMode = mode; }
 
         private void DiskSetting(string savePath)
         {
@@ -129,8 +145,8 @@ namespace YSDebugger
             int tryCount = 0;
             while (true)
             {
-                saveResultPath = GetSaveResultPath(folderPath, tryCount);
-                FileInfo fileInfo = new FileInfo(saveResultPath);
+                this.saveResultPath = GetSaveResultPath(folderPath, tryCount);
+                FileInfo fileInfo = new FileInfo(this.saveResultPath);
                 if (fileInfo.Exists)
                 {
                     tryCount++;
@@ -189,7 +205,7 @@ namespace YSDebugger
         {
             ConfigLineChangeable(valueString);
             string aligedString;
-            if (isLineChange)
+            if (this.isLineChange)
             {
                 aligedString = valueString + "\n";
             }
@@ -225,21 +241,21 @@ namespace YSDebugger
         private bool IsLineChangeable(string valueString)
         {
             int stringLen = valueString.Length;
-            return (stringLen > maxStringLen);
+            return (stringLen > this.maxStringLen);
         }
 
-        private void SetLineChangeOn() { isLineChange = true; }
+        private void SetLineChangeOn() { this.isLineChange = true; }
 
-        private bool IsLimitTapCount() { return (tapCount >= limitTapCount); }
+        private bool IsLimitTapCount() { return (this.tapCount >= this.limitTapCount); }
 
-        private void InitTapCount() { tapCount = 0; }
+        private void InitTapCount() { this.tapCount = 0; }
 
-        private void SetLineChangeOff() { isLineChange = false; }
+        private void SetLineChangeOff() { this.isLineChange = false; }
 
-        private void IncreaseTapCount() { tapCount++; }
+        private void IncreaseTapCount() { this.tapCount++; }
 
         private void PrintConsole(string valueString) { Console.Write(valueString); }
 
-        private void PrintDisk(string valueString) { File.AppendAllText(saveResultPath, valueString, Encoding.Default); }
+        private void PrintDisk(string valueString) { File.AppendAllText(this.saveResultPath, valueString, Encoding.Default); }
     }
 }
