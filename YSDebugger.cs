@@ -1,6 +1,6 @@
 /*
- 제목: 디버그 (V0.2.1)
- 날짜: 2021년 09월 27일
+ 제목: 디버그 (V0.2.2)
+ 날짜: 2021년 09월 28일
  작성: 김유승 (inspire156@gmail.com)
  사용법:
 	using YSDebugger;
@@ -66,7 +66,13 @@ namespace YSDebugger
 
         public void Print(char charValue) { PrintProcess(charValue.ToString()); }
 
-        public void Print(string stringValue) { PrintProcess(stringValue.ToString()); }
+        public void Print(string stringValue) {
+            if(stringValue == null)
+            {
+                stringValue = "NULL";
+            }
+            PrintProcess(stringValue.ToString()); 
+        }
 
         public void Print(Object objectValue) { PrintProcess(objectValue.ToString()); }
 
